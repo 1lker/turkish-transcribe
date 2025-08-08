@@ -198,19 +198,33 @@ export default function Home() {
                     
                     // Create a File object from the downloaded audio
                     try {
+                      console.log('Fetching downloaded file:', result.filename);
                       const response = await fetch(`/api/download/${result.filename}`);
-                      if (response.ok) {
-                        const blob = await response.blob();
-                        const file = new File([blob], result.filename, { type: 'audio/wav' });
-                        
-                        // Automatically start transcription
-                        await handleFileSelect(file);
-                        
-                        toast.success('Starting transcription for downloaded audio...');
+                      
+                      console.log('Download response status:', response.status);
+                      
+                      if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Download response error:', errorText);
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
                       }
+                      
+                      const blob = await response.blob();
+                      console.log('Blob created, size:', blob.size);
+                      
+                      const file = new File([blob], result.filename, { type: 'audio/wav' });
+                      console.log('File object created:', file.name, file.size);
+                      
+                      // Automatically start transcription
+                      toast.info('Starting transcription for downloaded audio...');
+                      await handleFileSelect(file);
+                      
+                      toast.success('Transcription process started successfully!');
+                      
                     } catch (error) {
                       console.error('Failed to process downloaded file:', error);
-                      toast.error('Downloaded successfully but failed to start transcription');
+                      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                      toast.error(`Downloaded successfully but failed to start transcription: ${errorMessage}`);
                     }
                   }}
                   onError={(error) => {
