@@ -157,7 +157,8 @@ class TranscriptionAPI {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(options),
-      }
+      },
+      900000  // 15 minutes for transcription
     );
 
     if (!response.ok) {
