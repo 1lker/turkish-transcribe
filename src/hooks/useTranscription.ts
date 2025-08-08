@@ -162,12 +162,14 @@ export function useTranscription(options: UseTranscriptionOptions = {}) {
 
       // Optional: Connect WebSocket for real-time updates
       try {
+        console.log('🔌 Attempting to connect WebSocket for task:', response.task_id);
         wsRef.current = api.connectWebSocket(response.task_id, {
           onMessage: (data) => {
-            console.log('WebSocket update:', data);
+            console.log('📨 WebSocket update received:', data);
             
             // Handle different message types
             if (data.type === 'progress') {
+              console.log('📊 Progress update:', data.data);
               setTranscriptionState(prev => ({
                 ...prev,
                 progress: data.data.progress || 0,
@@ -183,12 +185,14 @@ export function useTranscription(options: UseTranscriptionOptions = {}) {
                 });
               }
             } else if (data.type === 'status') {
+              console.log('🎯 Status update:', data.data);
               setTranscriptionState(prev => ({
                 ...prev,
                 status: data.data.status,
                 progress: data.data.progress || prev.progress,
               }));
             } else if (data.type === 'result') {
+              console.log('✅ Result received:', data.data);
               setTranscriptionState(prev => ({
                 ...prev,
                 status: 'completed',
@@ -196,6 +200,7 @@ export function useTranscription(options: UseTranscriptionOptions = {}) {
                 result: data.data,
               }));
             } else if (data.type === 'error') {
+              console.log('❌ Error received:', data.data);
               setTranscriptionState(prev => ({
                 ...prev,
                 status: 'failed',
@@ -204,14 +209,18 @@ export function useTranscription(options: UseTranscriptionOptions = {}) {
             }
           },
           onError: (error) => {
-            console.error('WebSocket error:', error);
+            console.error('❌ WebSocket error:', error);
           },
           onClose: () => {
+            console.log('🔌 WebSocket disconnected');
             wsRef.current = null;
           },
+          onOpen: () => {
+            console.log('✅ WebSocket connected successfully');
+          }
         });
       } catch (wsError) {
-        console.warn('WebSocket connection failed, continuing with polling only:', wsError);
+        console.error('❌ Failed to connect WebSocket:', wsError);
       }
 
     } catch (error) {

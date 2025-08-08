@@ -137,7 +137,12 @@ export default function TranscriptionResultCard({
               Transcription Sonucu
             </CardTitle>
             <CardDescription>
-              {status === 'processing' && 'Ses dosyanız işleniyor...'}
+              {status === 'processing' && (
+                <div>
+                  <div>{stage || 'Ses dosyanız işleniyor...'}</div>
+                  {message && <div className="text-xs text-gray-500 mt-1">{message}</div>}
+                </div>
+              )}
               {status === 'completed' && 'Transcription tamamlandı!'}
               {status === 'failed' && 'İşlem başarısız oldu'}
               {status === 'pending' && 'İşlem başlamayı bekliyor...'}
@@ -214,9 +219,9 @@ export default function TranscriptionResultCard({
                   <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-white mb-2">İşleniyor...</h3>
+                  <h3 className="font-medium text-white mb-2">{stage || 'İşleniyor...'}</h3>
                   <p className="text-sm text-gray-400">
-                    Ses dosyanız analiz ediliyor ve metne dönüştürülüyor
+                    {message || 'Ses dosyanız analiz ediliyor ve metne dönüştürülüyor'}
                   </p>
                 </div>
               </div>
