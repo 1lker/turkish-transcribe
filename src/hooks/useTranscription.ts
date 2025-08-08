@@ -165,12 +165,41 @@ export function useTranscription(options: UseTranscriptionOptions = {}) {
         wsRef.current = api.connectWebSocket(response.task_id, {
           onMessage: (data) => {
             console.log('WebSocket update:', data);
-            // Handle real-time updates if needed
-            if (data.status && data.progress !== undefined) {
+            
+            // Handle different message types
+            if (data.type === 'progress') {
               setTranscriptionState(prev => ({
                 ...prev,
-                progress: data.progress,
-                status: data.status,
+                progress: data.data.progress || 0,
+                stage: data.data.stage || prev.stage,
+                message: data.data.message || '',
+              }));
+              
+              // Update toast with progress
+              if (toastIdRef.current) {
+                toast.loading(`${data.data.stage || 'Processing'}: ${data.data.progress || 0}%`, {
+                  id: toastIdRef.current,
+                  description: data.data.message || 'Transcription in progress...'
+                });
+              }
+            } else if (data.type === 'status') {
+              setTranscriptionState(prev => ({
+                ...prev,
+                status: data.data.status,
+                progress: data.data.progress || prev.progress,
+              }));
+            } else if (data.type === 'result') {
+              setTranscriptionState(prev => ({
+                ...prev,
+                status: 'completed',
+                progress: 100,
+                result: data.data,
+              }));
+            } else if (data.type === 'error') {
+              setTranscriptionState(prev => ({
+                ...prev,
+                status: 'failed',
+                error: data.data.error,
               }));
             }
           },

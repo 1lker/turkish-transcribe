@@ -46,7 +46,7 @@ export default function TranscriptionResultCard({
   const [showTimestamps, setShowTimestamps] = useState(false);
   const [expandedSegments, setExpandedSegments] = useState<Set<number>>(new Set());
 
-  const { status, progress, result, error } = transcriptionState;
+  const { status, progress, result, error, stage, message } = transcriptionState;
 
   useEffect(() => {
     if (copied) {
@@ -164,10 +164,15 @@ export default function TranscriptionResultCard({
             className="space-y-2"
           >
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400">İlerleme</span>
+              <span className="text-slate-400">
+                {stage || 'İşleniyor'}
+              </span>
               <span className="text-blue-400">{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} className="h-2" />
+            {message && (
+              <p className="text-xs text-slate-500 mt-1">{message}</p>
+            )}
           </motion.div>
         )}
       </CardHeader>

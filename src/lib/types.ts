@@ -98,6 +98,8 @@ export interface TranscriptionState {
   taskId?: string;
   status: TaskStatus;
   progress: number;
+  stage?: string;
+  message?: string;
   result?: TranscriptionResponse;
   error?: string;
 }
