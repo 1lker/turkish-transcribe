@@ -35,7 +35,7 @@ class TranscriptionAPI {
   private async fetchWithTimeout(
     url: string,
     options: RequestInit = {},
-    timeout: number = 30000
+    timeout: number = 900000  // 15 minutes (15 * 60 * 1000)
   ): Promise<Response> {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
